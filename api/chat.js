@@ -1,5 +1,5 @@
 export default async function handler(req, res) {
-    // Configuração de CORS
+    // Configuração de CORS para o Frontend funcionar
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -7,17 +7,17 @@ export default async function handler(req, res) {
     if (req.method === 'OPTIONS') return res.status(200).end();
 
     try {
-        const apiKey = process.env.API_KEY; // A chave da conta certa que você configurou
+        const apiKey = process.env.API_KEY;
         
         if (!apiKey) {
-            return res.status(500).json({ error: "API_KEY não encontrada na Vercel." });
+            return res.status(500).json({ error: "API_KEY não configurada no painel da Vercel." });
         }
 
         const { system_instruction, contents, generationConfig } = req.body;
 
-        // URL para o modelo mais atual em 2026 usando v1beta (para suportar system_instruction)
+        // O Gemini 3 brilha na v1beta
         const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`,
             {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -32,13 +32,13 @@ export default async function handler(req, res) {
         const data = await response.json();
 
         if (!response.ok) {
-            // Se der erro de cota ou modelo, o erro aparecerá detalhado aqui
-            return res.status(response.status).json({ error: data.error?.message || "Erro na API" });
+            // Isso vai nos dizer se a cota do Gemini 3 está livre para sua chave
+            return res.status(response.status).json({ error: data.error?.message || "Erro na API do Gemini 3" });
         }
 
         return res.status(200).json(data);
 
     } catch (error) {
-        return res.status(500).json({ error: "Erro interno no servidor: " + error.message });
+        return res.status(500).json({ error: "Erro interno: " + error.message });
     }
 }
