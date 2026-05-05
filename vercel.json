@@ -1,8 +1,15 @@
 {
-  "rewrites": [
+  "headers": [
     {
-      "source": "/api/(.*)",
-      "destination": "/api/$1"
+      "source": "/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "https://www.impactprodutividade.com.br" },
+        { "key": "Content-Security-Policy", "value": "frame-ancestors 'self' https://www.impactprodutividade.com.br" }
+      ]
     }
+  ],
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/$1" },
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
